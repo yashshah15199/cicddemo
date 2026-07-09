@@ -1,0 +1,41 @@
+name: Node.js CI
+
+# Trigger the workflow on push or pull request to the main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x] # Tests your API across multiple Node versions
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm' # Caches npm packages for faster subsequent runs
+
+    - name: Install dependencies
+      run: npm ci # Faster, cleaner install for CI environments
+
+    # Add this step at the very bottom of your ci.yml jobs
+    - name: Trigger Render Deploy Hook
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+    # Optional: Uncomment if you add a linter or test suite later
+    # - name: Run Linting
+    #   run: npm run lint
+    #
+    # - name: Run Tests
+    #   run: npm test
