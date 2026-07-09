@@ -1,11 +1,14 @@
-let express = require('express');
-let app = express();
-let port = 3000;
+const express = require('express');
+const app = express();
 
-app.get('/', (req, res) => {
-    res.send('Hello World!!!!!!');
+// Render overrides this value automatically
+const PORT = process.env.PORT || 3000; 
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP' });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+// Bind to 0.0.0.0 so the containerized process can receive external traffic
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Dockerized Express app running on port ${PORT}`);
 });
