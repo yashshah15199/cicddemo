@@ -1,0 +1,16 @@
+name: Keep Render App Alive
+
+on:
+  schedule:
+    # Runs every 12 minutes, 24/7
+    - cron: '*/12 * * * *'
+  # Allows you to manually trigger it from the GitHub Actions tab
+  workflow_dispatch: 
+
+jobs:
+  ping-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Ping Request
+        run: |
+          curl -I https://cicddemo-1.onrender.com/health
